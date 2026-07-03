@@ -2,57 +2,244 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#0a0a14" />
 <title>Online</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <style>
-:root{--bg:#0a0a14;--surface:#11111e;--card:#191928;--border:#252540;--accent:#e8b86d;--accent2:#7c6af5;--accent3:#5de8a0;--text:#e8e8f0;--muted:#6666aa;--radius:12px}
+:root{
+  --bg:#0a0a14;
+  --surface:#11111ecc;
+  --card:#191928;
+  --card-hover:#20203a;
+  --border:#252540;
+  --accent:#e8b86d;
+  --accent2:#7c6af5;
+  --accent3:#5de8a0;
+  --text:#e8e8f0;
+  --muted:#8888bb;
+  --radius:14px;
+  --safe-top:env(safe-area-inset-top);
+  --safe-bottom:env(safe-area-inset-bottom);
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial, Helvetica, sans-serif;background:var(--bg);color:var(--text)}
-.header{background:var(--surface);padding:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
-.header-title{color:var(--accent);font-weight:700}
-.nav-bar{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--surface);border-top:1px solid var(--border)}
-.nav-item{flex:1;padding:10px;text-align:center;color:var(--muted);cursor:pointer}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,Helvetica,sans-serif;
+  background:radial-gradient(circle at top, #14142a 0%, var(--bg) 60%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+
+/* Header */
+.header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:var(--surface);
+  backdrop-filter:blur(10px);
+  padding:calc(12px + var(--safe-top)) 16px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid var(--border);
+}
+.header-title{color:var(--accent);font-weight:700;font-size:17px;letter-spacing:.2px}
+.header-version{color:var(--muted);font-size:12px;background:var(--card);padding:3px 8px;border-radius:20px;border:1px solid var(--border)}
+
+/* Layout container so content doesn't stretch too wide on desktop */
+.container{max-width:720px;margin:0 auto}
+
+/* Bottom nav */
+.nav-bar{
+  position:fixed;left:0;right:0;bottom:0;
+  display:flex;
+  background:var(--surface);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--border);
+  padding-bottom:var(--safe-bottom);
+  z-index:10;
+}
+.nav-item{
+  flex:1;
+  padding:10px 4px 8px;
+  text-align:center;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  transition:color .15s ease;
+  user-select:none;
+}
+.nav-item .nav-icon{font-size:18px;line-height:1}
 .nav-item.active{color:var(--accent)}
-.page{display:none;padding:16px 12px 90px}
-.page.active{display:block}
-.games-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.game-card{background:var(--card);padding:12px;border-radius:10px;border:1px solid var(--border);cursor:pointer}
-.detail-header{background:var(--card);padding:12px;border-radius:8px;border:1px solid var(--border)}
-.search-input{width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:80px;background:#222;padding:10px 12px;border-radius:8px;border:1px solid var(--border);display:none}
+.nav-item:active{opacity:.7}
+
+/* Pages */
+.page{display:none}
+.page.active{display:block;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.page-inner{padding:16px 16px calc(96px + var(--safe-bottom))}
+
+/* Search */
+.search-wrap{margin-bottom:14px}
+.search-input{
+  width:100%;
+  padding:11px 14px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  font-size:14px;
+  outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.search-input::placeholder{color:var(--muted)}
+.search-input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(124,106,245,.2)}
+
+/* Games grid - responsive */
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));
+  gap:10px;
+}
+.game-card{
+  background:var(--card);
+  padding:14px;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+  cursor:pointer;
+  transition:transform .12s ease, background .12s ease, border-color .12s ease;
+}
+.game-card:hover{background:var(--card-hover);border-color:var(--accent2)}
+.game-card:active{transform:scale(.97)}
+.game-card .idx{font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px}
+.game-card .name{font-weight:700;font-size:14px;line-height:1.3;margin-bottom:4px;word-break:break-word}
+.game-card .pkg{font-size:11px;color:var(--muted);word-break:break-all}
+.empty-state{color:var(--muted);text-align:center;padding:40px 16px;font-size:14px}
+
+/* Detail page */
+.detail-header{
+  background:var(--card);
+  padding:16px;
+  border-radius:var(--radius);
+  border:1px solid var(--border);
+}
+.detail-header .name{font-weight:700;font-size:19px;margin-bottom:4px}
+.detail-header .pkg{color:var(--muted);font-size:12px}
+.detail-section{margin-top:16px}
+.detail-section .label{margin-bottom:8px;font-weight:700;font-size:13px;color:var(--accent3)}
+.detail-box{background:var(--card);padding:12px 14px;border-radius:10px;border:1px solid var(--border);font-size:14px;word-break:break-word}
+
+/* Buttons */
+.btn{
+  appearance:none;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  padding:10px 16px;
+  border-radius:10px;
+  font-size:14px;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:background .15s ease, border-color .15s ease;
+}
+.btn:hover{background:var(--card-hover);border-color:var(--accent2)}
+.btn:active{transform:scale(.97)}
+
+/* Toast */
+.toast{
+  position:fixed;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:calc(84px + var(--safe-bottom));
+  background:var(--card);
+  color:var(--text);
+  padding:10px 16px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+  display:none;
+  font-size:13px;
+  z-index:20;
+}
+
+/* Placeholder page (python) */
+.placeholder{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:60px 20px;
+  color:var(--muted);
+}
+.placeholder .icon{font-size:32px;margin-bottom:8px}
+.placeholder .title{font-weight:700;color:var(--text);font-size:16px;margin-bottom:4px}
 </style>
 </head>
 <body>
-<div class="header"><div class="header-title">⚡ Online</div><div>v17.0</div></div>
-
-<!-- Pages -->
-<div id="page-games" class="page active">
-  <div style="margin-bottom:8px"><input id="search" class="search-input" placeholder="Search games..." oninput="applyFilters()"></div>
-  <div id="games-grid" class="games-grid"></div>
+<div class="header">
+  <div class="header-title">⚡ Online</div>
+  <div class="header-version">v17.1</div>
 </div>
 
-<div id="page-detail" class="page">
-  <div class="detail-header">
-    <div id="detail-name" style="font-weight:700;font-size:18px"></div>
-    <div id="detail-pkg" style="color:var(--muted);font-size:12px"></div>
+<div class="container">
+  <!-- Pages -->
+  <div id="page-games" class="page active">
+    <div class="page-inner">
+      <div class="search-wrap">
+        <input id="search" class="search-input" placeholder="Search games..." oninput="applyFilters()">
+      </div>
+      <div id="games-grid" class="games-grid"></div>
+    </div>
   </div>
-  <div style="margin-top:12px">
-    <div style="margin-bottom:8px"><strong>Event Template</strong></div>
-    <div id="detail-template" style="background:var(--card);padding:10px;border-radius:8px;border:1px solid var(--border)"></div>
-  </div>
-  <div style="margin-top:12px"><button onclick="goBack()">← Back</button></div>
-</div>
 
-<div id="page-python" class="page">
-  <div style="font-weight:700">🐍 Python (disabled in this demo)</div>
+  <div id="page-detail" class="page">
+    <div class="page-inner">
+      <div class="detail-header">
+        <div id="detail-name" class="name"></div>
+        <div id="detail-pkg" class="pkg"></div>
+      </div>
+      <div class="detail-section">
+        <div class="label">Event Template</div>
+        <div id="detail-template" class="detail-box"></div>
+      </div>
+      <div style="margin-top:16px">
+        <button class="btn" onclick="goBack()">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="page-python" class="page">
+    <div class="page-inner">
+      <div class="placeholder">
+        <div class="icon">🐍</div>
+        <div class="title">Python</div>
+        <div>Disabled in this demo</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <nav class="nav-bar">
-  <div class="nav-item active" data-page="games" onclick="switchPage(event)">Games</div>
-  <div class="nav-item" data-page="python" onclick="switchPage(event)">Python</div>
-  <div class="nav-item" data-page="settings" onclick="switchPage(event)">Settings</div>
+  <div class="nav-item active" data-page="games" onclick="switchPage(event)">
+    <span class="nav-icon">🎮</span><span>Games</span>
+  </div>
+  <div class="nav-item" data-page="python" onclick="switchPage(event)">
+    <span class="nav-icon">🐍</span><span>Python</span>
+  </div>
+  <div class="nav-item" data-page="settings" onclick="switchPage(event)">
+    <span class="nav-icon">⚙️</span><span>Settings</span>
+  </div>
 </nav>
 
 <div id="toast" class="toast"></div>
@@ -70,7 +257,11 @@ let activeFilter = 'all';
 
 function renderGames(list){
   const grid = document.getElementById('games-grid');
-  grid.innerHTML = list.map((g,i)=>`<div class="game-card" onclick="openGame(${i})"><div style="font-size:12px;color:var(--accent)">#${String(i+1).padStart(2,'0')}</div><div style="font-weight:700">${escapeHtml(g.name)}</div><div style="font-size:11px;color:var(--muted)">${escapeHtml(g.package)}</div></div>`).join('');
+  if(!list.length){
+    grid.innerHTML = '<div class="empty-state">No games match your search.</div>';
+    return;
+  }
+  grid.innerHTML = list.map((g,i)=>`<div class="game-card" onclick="openGame(${i})"><div class="idx">#${String(i+1).padStart(2,'0')}</div><div class="name">${escapeHtml(g.name)}</div><div class="pkg">${escapeHtml(g.package)}</div></div>`).join('');
 }
 
 function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -92,15 +283,29 @@ function openGame(i){
 
 function goBack(){ switchTo('games'); }
 
-function switchPage(e){ const p=e.currentTarget.dataset.page; if(p==='settings'){ alert('Settings are available in the full app'); } switchTo(p==='games'?'games':(p==='python'?'python':'games')); }
+function switchPage(e){
+  const p = e.currentTarget.dataset.page;
+  if(p==='settings'){ showToast('Settings are available in the full app'); return; }
+  switchTo(p);
+}
 
-function switchTo(page){ document.querySelectorAll('.page').forEach(el=>el.classList.remove('active')); document.getElementById('page-'+page).classList.add('active'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page)); }
+function switchTo(page){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
+  window.scrollTo(0,0);
+}
 
 renderGames(GAMES_DATA);
 
 // Simple toast
-function showToast(msg, ms=2000){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',ms)}
-
+function showToast(msg, ms=2200){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.display='block';
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>t.style.display='none',ms);
+}
 </script>
 </body>
 </html>
